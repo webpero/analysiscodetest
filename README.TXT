@@ -19,3 +19,7 @@ Details about RSI can be found here: http://stockcharts.com/school/doku.php?id=c
 In the data/ folder are historical prices for two stocks (Statoil on Oslo stock exchange and ABB on Stockholm stock exchange). Use one or both of these for your calculations.
 Submit your solution using a platform and language of your choosing (but be prepared to defend your choice if you choose something weird :) ). Feel free to use a library to draw
 your charts.
+
+Finally, answer these questions:
+- There are about 500 datapoints in each file in this test. What would you do differently if there were 80000 datapoints.
+- How would you accomodate real time streaming updates to the dataset.
