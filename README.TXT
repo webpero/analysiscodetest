@@ -21,5 +21,5 @@ Submit your solution using a platform and language of your choosing (but be prep
 your charts.
 
 Finally, answer these questions:
-- There are about 500 datapoints in each file in this test. What would you do differently if there were 80000 datapoints.
+- There are about 500 datapoints in each file in this test. What would you do differently if there were 30000 datapoints.
 - How would you accomodate real time streaming updates to the dataset.
