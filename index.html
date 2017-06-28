@@ -113,7 +113,7 @@
 			prevAVGGain = rsiData[rsiPeriod].avgGain;
 			prevAVGLoss = rsiData[rsiPeriod].avgLoss;
 
-			console.log(
+			console.log( i + ' | ' +
 			 		parseFloat(rsiData[i].gain).toFixed(2) + ' | ' +
 			 		parseFloat(rsiData[i].loss).toFixed(2) + ' | ' +
 			 		parseFloat(rsiData[i].avgGain).toFixed(2) + ' | ' +
@@ -129,7 +129,7 @@
 				prevAVGGain = rsiData[i].avgGain;
 				prevAVGLoss = rsiData[i].avgLoss;
 
-				console.log(
+				console.log(  i + ' | ' +
 						parseFloat(rsiData[i].gain).toFixed(2) + ' | ' +
 						parseFloat(rsiData[i].loss).toFixed(2) + ' | ' +
 						parseFloat(rsiData[i].avgGain).toFixed(2) + ' | ' +
@@ -141,6 +141,7 @@
 			for( i = rsiPeriod; i < totalPeriod; i++ ) {
 				rsiChartData[i] = {x: data[i].x, y: rsiData[i].rsi};
 			}
+			console.log( rsiChartData );
 			
 			/*********************************/
             var context = document.querySelector("#" + id).getContext('2d');
