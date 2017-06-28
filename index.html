@@ -138,7 +138,11 @@
 						parseFloat(rsiData[i].rsi).toFixed(2)
 				);
 			}				
-			/* (2) Put RSI-data in array for chart */
+			/* (2a) RSI-data for chart - Period before RSI can be calculated */
+			for( i = 0; i < rsiPeriod; i++ ) {
+				rsiChartData[i] = {x: data[i].x, y: null};
+			}
+			/* (2b) RSI-data for chart - Period with RSI-data */
 			for( i = rsiPeriod; i < totalPeriod; i++ ) {
 				rsiChartData[i] = {x: data[i].x, y: rsiData[i].rsi};
 			}
