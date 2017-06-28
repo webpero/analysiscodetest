@@ -73,11 +73,12 @@
             for (var index = 0; index < data.length; ++index) {
                 var avg = calculateMovingAverage(data, index);
                 var sd = calculateMovingStandardDeviation(data, index, avg);
-				maData[index].x = data.x;
+				var xVal = data[index].x;
+				maData[index].x = xVal;
 				maData[index].y = avg;
-				msdUpperData[index].x = data.x;
+				msdUpperData[index].x = xVal;
 				msdUpperData[index].y = avg + (sd * standardDeviations);
-				msdLowerData[index].x = data.x;
+				msdLowerData[index].x = xVal;
 				msdLowerData[index].y = avg - (sd * standardDeviations);
             }
 			/***/
