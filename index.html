@@ -74,12 +74,9 @@
                 var avg = calculateMovingAverage(data, index);
                 var sd = calculateMovingStandardDeviation(data, index, avg);
 				var xVal = data[index].x;
-				maData[index].x = xVal;
-				maData[index].y = avg;
-				msdUpperData[index].x = xVal;
-				msdUpperData[index].y = avg + (sd * standardDeviations);
-				msdLowerData[index].x = xVal;
-				msdLowerData[index].y = avg - (sd * standardDeviations);
+				maData.push( {x: xVal, y: avg} );
+				msdUpperData.push( {x: xVal, avg + (sd * standardDeviations)} );
+				msdLowerData.push( {x: xVal, avg - (sd * standardDeviations)} );
             }
 			/***/
             var context = document.querySelector("#" + id).getContext('2d');
