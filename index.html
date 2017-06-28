@@ -69,7 +69,8 @@
 
         function renderChart(id, dataSet) {
 			var maData = [], msdUpperData = [], msdLowerData = [];		// POM 28.06.2017: Data for Bollinger-Band, calculates from dataSet
-			var rsiData = [], rsiChartData = [];						// POM 28.06.2017: Data for RSI, calculates from dataSet
+			var rsiData = [{ gain: 0, loss: 0 }];						// POM 28.06.2017: Data for RSI, calculates from dataSet - first element is always empty
+			var rsiChartData = [];										// POM 28.06.2017: Data for chart for RSI, (y) from rsiData & (x) from dataSet
 			
             var data = dataSet.map(function(item, index, array) {
                 return {
