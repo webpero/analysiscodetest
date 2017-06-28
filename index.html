@@ -7,6 +7,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 
     <script type="text/javascript">
+	    /*** POM 28.06.2017: Functions for Moving Average and Moving Standard Deviation ***/
+		var	movingAverage = 20;
+		var standardDeviations = 2;
+        function calculateMovingAverage (data, i) 
+		{
+            if (movingAverage === 0) {
+                return data[i].y;
+            }
+
+            var count = Math.min(movingAverage, i + 1),
+                first = i + 1 - count;
+
+            var sum = 0;
+            for (var index = first; index <= i; ++index) {
+                var x = data[index].y;
+                sum += x;
+            }
+
+            return sum / count;
+        };
+        function calculateMovingStandardDeviation (data, i, avg) 
+		{
+            if (movingAverage === 0) {
+                return 0;
+            }
+
+            var count = Math.min(movingAverage, i + 1),
+                first = i + 1 - count;
+
+            var sum = 0;
+            for (var index = first; index <= i; ++index) {
+                var x = data[index].y;
+                var dx = x - avg;
+                sum += (dx * dx);
+            }
+
+            var variance = sum / count;
+            return Math.sqrt(variance);
+        };
+		/***/
+		
         document.addEventListener("DOMContentLoaded", function(event) {
             getDataSet("data/Oslo_STL.json", function(dataSet) {
                 if( dataSet ) {
@@ -21,6 +62,74 @@
         });
 
         function renderChart(id, dataSet) {
+			var maData[], msdUpperData[], msdLowerData[];		// POM 28.06.2017: Data for Bollinger-Band, calculates from dataSet
+            var data = dataSet.map(function(item, index, array) {
+                return {
+                    x: (new Date(item.date)).toISOString(),
+                    y: item.last
+                };
+            });
+			/* POM 28.06.2017: Calculate Bollinger-Band */
+            for (var index = 0; index < data.length; ++index) {
+                var avg = calculateMovingAverage(data, index);
+                var sd = calculateMovingStandardDeviation(data, index, avg);
+				maData[index].x = data.x;
+				maData[index].y = avg;
+				msdUpperData[index].x = data.x;
+				msdUpperData[index].y = avg + (sd * standardDeviations);
+				msdLowerData[index].y = data.x;
+				msdLowerData[index].y = avg - (sd * standardDeviations);
+            }
+			/***/
+            var context = document.querySelector("#" + id).getContext('2d');
+            var stockChart = new Chart(context, {
+                type: 'line',
+                data: {
+                    datasets: [
+						{
+							label: id,
+							fill: false,
+							data: data,
+							pointRadius: 0,
+							borderColor: "#1a5ecc"
+						},
+						/* POM 28.06.2017: Datasets for Bollinger-Band */
+						{
+							label: id + "-MovingAvg",
+							fill: false,
+							data: maData,
+							pointRadius: 0,
+							borderColor: "red"
+						},
+						{
+							label: id + "-UpperBand",
+							fill: false,
+							data: msdUpperData,
+							pointRadius: 0,
+							borderColor: "lightred"
+						},
+						{
+							label: id + "-LowerBand",
+							fill: false,
+							data: msdLowerData,
+							pointRadius: 0,
+							borderColor: "lightred"
+						},
+						/***/
+					]
+                },
+                options: {
+                    responsive: false,
+                    scales: {
+                        xAxes: [{
+                            type: "time",
+                            display: true
+                        }]
+                    }
+                }
+            });
+        }
+        function addToChart(id, dataSet) {
             var data = dataSet.map(function(item, index, array) {
                 return {
                     x: (new Date(item.date)).toISOString(),
@@ -36,7 +145,7 @@
                         fill: false,
                         data: data,
                         pointRadius: 0,
-                        borderColor: "#1a5ecc"
+                        borderColor: "red"
                     }]
                 },
                 options: {
