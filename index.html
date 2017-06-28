@@ -5,11 +5,17 @@
     <title>Infront code-test</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-
+	<!-- POM 28.06.2017: Styling -->
+	<style>
+	#ABB canvas {
+		margin-top: 20px;
+	}
+	</style>
     <script type="text/javascript">
-	    /*** POM 28.06.2017: Functions for Moving Average and Moving Standard Deviation ***/
+	    /*** POM 28.06.2017: Functions for Moving Average, Moving Standard Deviation & RSI ***/
 		var	movingAverage = 20;
 		var standardDeviations = 2;
+		var rsiPeriod = 14;
         function calculateMovingAverage (data, i) 
 		{
             if (movingAverage === 0) {
@@ -63,22 +69,80 @@
 
         function renderChart(id, dataSet) {
 			var maData = [], msdUpperData = [], msdLowerData = [];		// POM 28.06.2017: Data for Bollinger-Band, calculates from dataSet
+			var rsiData = [], rsiChartData = [];						// POM 28.06.2017: Data for RSI, calculates from dataSet
+			
             var data = dataSet.map(function(item, index, array) {
                 return {
                     x: (new Date(item.date)).toISOString(),
                     y: item.last
                 };
             });
-			/* POM 28.06.2017: Calculate Bollinger-Band */
-            for (var index = 0; index < data.length; ++index) {
-                var avg = calculateMovingAverage(data, index);
-                var sd = calculateMovingStandardDeviation(data, index, avg);
-				var xVal = data[index].x;
+			var totalPeriod = data.length;
+			
+			/* POM 28.06.2017: Calculate data for Bollinger-Band & Gain/Loss for RSI */
+            for ( var i = 0; i < totalPeriod; ++i ) 
+			{
+                var avg = calculateMovingAverage(data, i);
+                var sd = calculateMovingStandardDeviation(data, i, avg);
+				var xVal = data[i].x;
+				var diff;
 				maData.push( {x: xVal, y: avg} );
 				msdUpperData.push( {x: xVal, y: avg + (sd * standardDeviations)} );
 				msdLowerData.push( {x: xVal, y: avg - (sd * standardDeviations)} );
+				if ( i > 0 )
+				{
+					diff = data[i].y - data[i-1].y;
+					rsiData.push( { gain: (diff > 0 ? diff : 0), loss: (diff < 0 ? diff : 0) } );
+				}
             }
-			/***/
+			/* POM 28.06.2017: (1) Calculate RSI & (2) put in array for chart */
+			var avg_gain0 = rsiData[rsiPeriod].gain;
+			var avg_loss0 = rsiData[rsiPeriod].loss;
+			var prevAVGGain = -1;
+			var prevAVGLoss = -1;
+
+			/* (1a) Period before RSI can be calculated */
+			for ( i = 0; i < rsiPeriod; i++ ) 
+			{
+				avg_gain0 += rsiData[i].gain;
+				avg_loss0 += rsiData[i].loss;
+			}
+			rsiData[rsiPeriod].avgGain = parseFloat(avg_gain0) / rsiPeriod;
+			rsiData[rsiPeriod].avgLoss = parseFloat(avg_loss0) / rsiPeriod;
+			rsiData[rsiPeriod].rsi = 100 - (100 / (1 + parseFloat(rsiData[rsiPeriod].avgGain) / parseFloat(rsiData[rsiPeriod].avgLoss)));
+			prevAVGGain = rsiData[rsiPeriod].avgGain;
+			prevAVGLoss = rsiData[rsiPeriod].avgLoss;
+
+			console.log(
+			 		parseFloat(rsiData[i].gain).toFixed(2) + ' | ' +
+			 		parseFloat(rsiData[i].loss).toFixed(2) + ' | ' +
+			 		parseFloat(rsiData[i].avgGain).toFixed(2) + ' | ' +
+			 		parseFloat(rsiData[i].avgLoss).toFixed(2) + ' | ' +
+			 		parseFloat(rsiData[i].rsi).toFixed(2)
+			);
+			/* (1b) Period RSI can be calculated */
+			for( i = rsiPeriod+1; i < totalPeriod; i++ )
+			{
+				rsiData[i].avgGain = parseFloat(((prevAVGGain*(rsiPeriod-1)) + rsiData[i].gain)) / rsiPeriod;
+				rsiData[i].avgLoss = parseFloat(((prevAVGLoss*(rsiPeriod-1)) + rsiData[i].loss)) / rsiPeriod;
+				rsiData[i].rsi = 100 - (100 / (1 + rsiData[i].parseFloat(rsiData[i].avgGain) / parseFloat(rsiData[i].avgLoss)));
+				prevAVGGain = rsiData[i].avgGain;
+				prevAVGLoss = rsiData[i].avgLoss;
+
+				console.log(
+						parseFloat(rsiData[i].gain).toFixed(2) + ' | ' +
+						parseFloat(rsiData[i].loss).toFixed(2) + ' | ' +
+						parseFloat(rsiData[i].avgGain).toFixed(2) + ' | ' +
+						parseFloat(rsiData[i].avgLoss).toFixed(2) + ' | ' +
+						parseFloat(rsiData[i].rsi).toFixed(2)
+				);
+			}				
+			/* (2) Put RSI-data in array for chart */
+			for( i = rsiPeriod; i < totalPeriod; i++ ) {
+				rsiChartData[i] = {x: data[i].x, y: rsiData[i].rsi};
+			}
+			
+			/*********************************/
             var context = document.querySelector("#" + id).getContext('2d');
             var stockChart = new Chart(context, {
                 type: 'line',
@@ -126,25 +190,20 @@
                     }
                 }
             });
-        }
-        function addToChart(id, dataSet) {
-            var data = dataSet.map(function(item, index, array) {
-                return {
-                    x: (new Date(item.date)).toISOString(),
-                    y: item.last
-                };
-            });
-            var context = document.querySelector("#" + id).getContext('2d');
+			/* POM 28.06.2017: Separate graph for RSI */
+            context = document.querySelector("#" + id + "-RSI").getContext('2d');
             var stockChart = new Chart(context, {
                 type: 'line',
                 data: {
-                    datasets: [{
-                        label: id,
-                        fill: false,
-                        data: data,
-                        pointRadius: 0,
-                        borderColor: "red"
-                    }]
+                    datasets: [
+						{
+							label: id + "-RSI",
+							fill: false,
+							data: rsiChartData,
+							pointRadius: 0,
+							borderColor: "black"
+						},
+					]
                 },
                 options: {
                     responsive: false,
@@ -156,8 +215,9 @@
                     }
                 }
             });
-        }
-
+			/****************************************/
+		}
+ 
         function getDataSet(url, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url);
@@ -175,6 +235,12 @@
 <body>
 
     <canvas id="STL" width="900" height="450"></canvas>
+	<!-- POM 28.06.2017: Canvas for RSI-chart -->
+    <canvas id="STL-RSI" width="900" height="150"></canvas>
+
     <canvas id="ABB" width="900" height="450"></canvas>
+	<!-- POM 28.06.2017: Canvas for RSI-chart -->
+	<canvas id="ABB-RSI" width="900" height="150"></canvas>
+	
 </body>
 </html>
