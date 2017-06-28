@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Infront code-test</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 	<!-- POM 28.06.2017: Styling -->
 	<style>
-	#ABB canvas {
-		margin-top: 20px;
-	}
+		#ABB { margin-top: 30px; }
 	</style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
     <script type="text/javascript">
-	    /*** POM 28.06.2017: Functions for Moving Average, Moving Standard Deviation & RSI ***/
+	    /*** POM 28.06.2017: Functions for Moving Average + Moving Standard Deviation & RSI ***/
 		var	movingAverage = 20;
 		var standardDeviations = 2;
 		var rsiPeriod = 14;
@@ -21,16 +20,13 @@
             if (movingAverage === 0) {
                 return data[i].y;
             }
-
-            var count = Math.min(movingAverage, i + 1),
-                first = i + 1 - count;
-
+            var count = Math.min(movingAverage, i + 1);
+            var first = i + 1 - count;
             var sum = 0;
             for (var index = first; index <= i; ++index) {
                 var x = data[index].y;
                 sum += x;
             }
-
             return sum / count;
         };
         function calculateMovingStandardDeviation (data, i, avg) 
@@ -38,21 +34,18 @@
             if (movingAverage === 0) {
                 return 0;
             }
-
-            var count = Math.min(movingAverage, i + 1),
-                first = i + 1 - count;
-
+            var count = Math.min(movingAverage, i + 1);
+            var first = i + 1 - count;
             var sum = 0;
             for (var index = first; index <= i; ++index) {
                 var x = data[index].y;
                 var dx = x - avg;
                 sum += (dx * dx);
             }
-
             var variance = sum / count;
             return Math.sqrt(variance);
         };
-		/***/
+		/******************************************/
 		
         document.addEventListener("DOMContentLoaded", function(event) {
             getDataSet("data/Oslo_STL.json", function(dataSet) {
@@ -113,14 +106,6 @@
 			rsiData[rsiPeriod].rsi = 100 - (100 / (1 + parseFloat(rsiData[rsiPeriod].avgGain) / parseFloat(rsiData[rsiPeriod].avgLoss)));
 			prevAVGGain = rsiData[rsiPeriod].avgGain;
 			prevAVGLoss = rsiData[rsiPeriod].avgLoss;
-
-			console.log( i + ' | ' +
-			 		parseFloat(rsiData[i].gain).toFixed(2) + ' | ' +
-			 		parseFloat(rsiData[i].loss).toFixed(2) + ' | ' +
-			 		parseFloat(rsiData[i].avgGain).toFixed(2) + ' | ' +
-			 		parseFloat(rsiData[i].avgLoss).toFixed(2) + ' | ' +
-			 		parseFloat(rsiData[i].rsi).toFixed(2)
-			);
 			/* (1b) Period RSI can be calculated */
 			for( i = rsiPeriod+1; i < totalPeriod; i++ )
 			{
@@ -129,15 +114,8 @@
 				rsiData[i].rsi = 100 - (100 / (1 + parseFloat(rsiData[i].avgGain) / parseFloat(rsiData[i].avgLoss)));
 				prevAVGGain = rsiData[i].avgGain;
 				prevAVGLoss = rsiData[i].avgLoss;
-
-				console.log(  i + ' | ' +
-						parseFloat(rsiData[i].gain).toFixed(2) + ' | ' +
-						parseFloat(rsiData[i].loss).toFixed(2) + ' | ' +
-						parseFloat(rsiData[i].avgGain).toFixed(2) + ' | ' +
-						parseFloat(rsiData[i].avgLoss).toFixed(2) + ' | ' +
-						parseFloat(rsiData[i].rsi).toFixed(2)
-				);
-			}				
+			}	
+			
 			/* (2a) RSI-data for chart - Period before RSI can be calculated */
 			for( i = 0; i < rsiPeriod; i++ ) {
 				rsiChartData[i] = {x: data[i].x, y: null};
@@ -146,9 +124,8 @@
 			for( i = rsiPeriod; i < totalPeriod; i++ ) {
 				rsiChartData[i] = {x: data[i].x, y: rsiData[i].rsi};
 			}
-			console.log( rsiChartData );
-			
 			/*********************************/
+
             var context = document.querySelector("#" + id).getContext('2d');
             var stockChart = new Chart(context, {
                 type: 'line',
@@ -240,13 +217,13 @@
 </head>
 <body>
 
-    <canvas id="STL" width="900" height="450"></canvas>
+    <canvas id="STL" width="1000" height="400"></canvas>
 	<!-- POM 28.06.2017: Canvas for RSI-chart -->
-    <canvas id="STL-RSI" width="900" height="150"></canvas>
+    <canvas id="STL-RSI" width="1000" height="200"></canvas>
 
-    <canvas id="ABB" width="900" height="450"></canvas>
+    <canvas id="ABB" width="1000" height="400"></canvas>
 	<!-- POM 28.06.2017: Canvas for RSI-chart -->
-	<canvas id="ABB-RSI" width="900" height="150"></canvas>
+	<canvas id="ABB-RSI" width="1000" height="200"></canvas>
 	
 </body>
 </html>
