@@ -125,7 +125,7 @@
 			{
 				rsiData[i].avgGain = parseFloat(((prevAVGGain*(rsiPeriod-1)) + rsiData[i].gain)) / rsiPeriod;
 				rsiData[i].avgLoss = parseFloat(((prevAVGLoss*(rsiPeriod-1)) + rsiData[i].loss)) / rsiPeriod;
-				rsiData[i].rsi = 100 - (100 / (1 + rsiData[i].parseFloat(rsiData[i].avgGain) / parseFloat(rsiData[i].avgLoss)));
+				rsiData[i].rsi = 100 - (100 / (1 + parseFloat(rsiData[i].avgGain) / parseFloat(rsiData[i].avgLoss)));
 				prevAVGGain = rsiData[i].avgGain;
 				prevAVGLoss = rsiData[i].avgLoss;
 
