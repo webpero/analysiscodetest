@@ -93,7 +93,7 @@
 				if ( i > 0 )
 				{
 					diff = data[i].y - data[i-1].y;
-					rsiData.push( { gain: (diff > 0 ? diff : 0), loss: (diff < 0 ? diff : 0) } );
+					rsiData.push( { gain: (diff > 0 ? diff : 0), loss: (diff < 0 ? -diff : 0) } );
 				}
             }
 			/* POM 28.06.2017: (1) Calculate RSI & (2) put in array for chart */
