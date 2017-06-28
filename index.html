@@ -62,7 +62,7 @@
         });
 
         function renderChart(id, dataSet) {
-			var maData[], msdUpperData[], msdLowerData[];		// POM 28.06.2017: Data for Bollinger-Band, calculates from dataSet
+			var maData, msdUpperData, msdLowerData;		// POM 28.06.2017: Data for Bollinger-Band, calculates from dataSet
             var data = dataSet.map(function(item, index, array) {
                 return {
                     x: (new Date(item.date)).toISOString(),
@@ -77,7 +77,7 @@
 				maData[index].y = avg;
 				msdUpperData[index].x = data.x;
 				msdUpperData[index].y = avg + (sd * standardDeviations);
-				msdLowerData[index].y = data.x;
+				msdLowerData[index].x = data.x;
 				msdLowerData[index].y = avg - (sd * standardDeviations);
             }
 			/***/
