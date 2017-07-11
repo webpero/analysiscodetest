@@ -24,8 +24,7 @@
             var first = i + 1 - count;
             var sum = 0;
             for (var index = first; index <= i; ++index) {
-                var x = data[index].y;
-                sum += x;
+                sum += data[index].y;
             }
             return sum / count;
         };
@@ -37,9 +36,9 @@
             var count = Math.min(movingAverage, i + 1);
             var first = i + 1 - count;
             var sum = 0;
+			var dx;	//PMU 11.07.2017: Flyttet deklarasjon av dx ut av loop og fjernet deklarering av x
             for (var index = first; index <= i; ++index) {
-                var x = data[index].y;
-                var dx = x - avg;
+                var dx = data[index].y - avg;
                 sum += (dx * dx);
             }
             var variance = sum / count;
@@ -74,12 +73,12 @@
 			var totalPeriod = data.length;
 			
 			/* POM 28.06.2017: Calculate data for Bollinger-Band & Gain/Loss for RSI */
+			var avg, sd, xVal, diff; //PMU 11.07.2017: Flyttet deklarasjonene ut av loop 
             for ( var i = 0; i < totalPeriod; ++i ) 
 			{
-                var avg = calculateMovingAverage(data, i);
-                var sd = calculateMovingStandardDeviation(data, i, avg);
-				var xVal = data[i].x;
-				var diff;
+                avg = calculateMovingAverage(data, i);
+                sd = calculateMovingStandardDeviation(data, i, avg);
+				xVal = data[i].x;
 				maData.push( {x: xVal, y: avg} );
 				msdUpperData.push( {x: xVal, y: avg + (sd * standardDeviations)} );
 				msdLowerData.push( {x: xVal, y: avg - (sd * standardDeviations)} );
